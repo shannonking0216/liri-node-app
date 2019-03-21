@@ -6,35 +6,17 @@ const Spotify = require("node-spotify-api");
 const spotify = new Spotify(keys.spotify);
 
 // Takes in all of the command line arguments
-const inputString = process.argv;
 const action = process.argv[2];
-
-
 let value = "";
 for (var i = 3; i < process.argv.length; i++) {
     value += process.argv[i] + "+";
 }
 value = value.slice(0, -1);
-
-// action: movie-this
-// value: the+matrix
-
 // first iteration - i+
-
 // second iteration - i+want+
 
-
-
-// store the results from each command here
-
-// --------------------------------------------
-
 function spotifyMySong(songTitle) {
-    // let searchTerm = "ace of bass";
-    // if (songTitle) {
-    //     searchTerm = songTitle;
-    // }
-
+    // If no song is provided, then your program will default to "The Sign" by Ace of Base
     let searchTerm;
     if (!songTitle) {
         searchTerm = "Ace of Bass";
@@ -46,7 +28,6 @@ function spotifyMySong(songTitle) {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
-        // console.log(JSON.stringify(data, null, 2));
         for (let i = 0; i < data.tracks.items.length; i++) {
             // artistData is printed in the terminal
             const artistData = data.tracks.items[i];
@@ -54,25 +35,11 @@ function spotifyMySong(songTitle) {
             // the locations should come from the objects in the JSON data
             console.log("\n\nArtist(s): " + artistData.artists[0].name + "\nSong Name: " + artistData.name + "\nSpotify Preview Link: " + artistData.preview_url + "\nAlbum Name: " + artistData.album.name);
         }
-        // If no song is provided, then your program will default to "The Sign" by Ace of Base
     });
 }
 
-
 function concert() {
-    if (err) {
-        return console.log('Error occurred: ' + err);
-    }
-    console.log(JSON.stringify(data, null, 2));
-}
-
-function movie(movieName) {
-
-    // console.log(JSON.stringify(data, null, 2));
-    // console.log("key", keys.omdbKey.secret);
-
-    var requestUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=" + keys.omdbKey.secret;
-    console.log(requestUrl);
+    var requestUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
     axios.get(requestUrl)
         .then(function (response) {
             console.log(response.data);
@@ -80,6 +47,42 @@ function movie(movieName) {
         .catch(function (err) {
             console.log('Error occurred: ' + err);
         });
+    /*  for (let i = 0; i < data.concert.items.length; i++) {
+        const concertData = data.concert.items[i];   
+        conole.log("\n\nName of the venue: " + concertData.venue +... Venue location
+        Date of the Event (use moment to format this as "MM/DD/YYYY"))
+            */
+}
+
+function movie(movieName) {
+    let searchTerm;
+    if (!movieName) {
+        searchTerm = "Mr. Nobody";
+    } else {
+        searchTerm = movieName;
+    }
+    var requestUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=" + keys.omdbKey.secret;
+    console.log(requestUrl);
+    
+    axios.get(requestUrl)
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(function (err) {
+            console.log('Error occurred: ' + err);
+        });
+    /*  for (let i = 0; i < data.movie.items.length; i++) {
+        const movieData = data.movie.items[i];   
+        conole.log("\n\nName of the movie: " + movieData.venue + ....                                              
+        * Title of the movie.
+        * Year the movie came out.
+        * IMDB Rating of the movie.
+        * Rotten Tomatoes Rating of the movie.
+        * Country where the movie was produced.
+        * Language of the movie.
+        * Plot of the movie.
+        * Actors in the movie. ))
+        */
 }
 
 function doWhatItSays() {
@@ -91,28 +94,31 @@ function doWhatItSays() {
 
         var randomAction = dataArray[0];
         var randomValue = dataArray[1];
+        if (randomAction === "do-what-it-says") {
+            console.log("Please use either spotify-this-song, concert-this, movie-this");
+            return;
+        }
 
         functionCall(randomAction, randomValue);
-
     });
 }
 
-const functionCall = function(theAction, theValue) {
+const functionCall = function (theAction, theValue) {
     // theAction: movie-this
     // theValue: the+matrix
     switch (theAction) {
         case "spotify-this-song":
             spotifyMySong(theValue);
             break;
-    
+
         case "concert-this":
             concert(theValue);
             break;
-    
+
         case "movie-this":
             movie(theValue);
             break;
-    
+
         case "do-what-it-says":
             doWhatItSays();
             break;
@@ -121,14 +127,7 @@ const functionCall = function(theAction, theValue) {
     }
 }
 
-// console.log(action);
-// console.log(value);
-
 functionCall(action, value);
-
-
-
-
 
 /*
 Liri will understand four commands:
@@ -174,5 +173,5 @@ Liri will understand four commands:
             It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
             Edit the text in random.txt to test out the feature for movie-this and concert-this.
 
-USE GIPHY APP (maybe), and make a nice readme for your app
+Take screenshots, and make a readme for your app.
             */
