@@ -38,96 +38,98 @@ function spotifyMySong(songTitle) {
     });
 }
 
-function concert() {
+function concert(artist) {
     var requestUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
     axios.get(requestUrl)
         .then(function (response) {
-            console.log(response.data);
+            console.log(response);
+            for (let i = 0; i < response.length; i++) {
+                const response = response[i];
+                /*  for (let i = 0; i < data.concert.items.length; i++) {
+              const concertData = data.concert.items[i];   
+              conole.log("\n\nName of the venue: " + concertData.venue +... Venue location
+              Date of the Event (use moment to format this as "MM/DD/YYYY"))
+              */
+            }
         })
         .catch(function (err) {
             console.log('Error occurred: ' + err);
         });
-    /*  for (let i = 0; i < data.concert.items.length; i++) {
-        const concertData = data.concert.items[i];   
-        conole.log("\n\nName of the venue: " + concertData.venue +... Venue location
-        Date of the Event (use moment to format this as "MM/DD/YYYY"))
+
+    function movie(movieName) {
+        let searchTerm;
+        if (!movieName) {
+            searchTerm = "Mr. Nobody";
+        } else {
+            searchTerm = movieName;
+        }
+        var requestUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=" + keys.omdbKey.secret;
+        console.log(requestUrl);
+
+        axios.get(requestUrl)
+            .then(function (response) {
+                console.log(response.data);
+             /*  for (let i = 0; i < data.movie.items.length; i++) {
+            const movieData = data.movie.items[i];   
+            conole.log("\n\nName of the movie: " + movieData.venue + ....                                              
+            * Title of the movie.
+            * Year the movie came out.
+            * IMDB Rating of the movie.
+            * Rotten Tomatoes Rating of the movie.
+            * Country where the movie was produced.
+            * Language of the movie.
+            * Plot of the movie.
+            * Actors in the movie. ))
             */
-}
-
-function movie(movieName) {
-    let searchTerm;
-    if (!movieName) {
-        searchTerm = "Mr. Nobody";
-    } else {
-        searchTerm = movieName;
+            })
+            .catch(function (err) {
+                console.log('Error occurred: ' + err);
+            });
     }
-    var requestUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=" + keys.omdbKey.secret;
-    console.log(requestUrl);
-    
-    axios.get(requestUrl)
-        .then(function (response) {
-            console.log(response.data);
-        })
-        .catch(function (err) {
-            console.log('Error occurred: ' + err);
+
+    function doWhatItSays() {
+        fs.readFile("random.txt", "utf8", function (err, data) {
+            if (err) {
+                return console.log('Error occurred: ' + err);
+            }
+            var dataArray = data.split(",");
+
+            var randomAction = dataArray[0];
+            var randomValue = dataArray[1];
+            if (randomAction === "do-what-it-says") {
+                console.log("Please use either spotify-this-song, concert-this, movie-this");
+                return;
+            }
+
+            functionCall(randomAction, randomValue);
         });
-    /*  for (let i = 0; i < data.movie.items.length; i++) {
-        const movieData = data.movie.items[i];   
-        conole.log("\n\nName of the movie: " + movieData.venue + ....                                              
-        * Title of the movie.
-        * Year the movie came out.
-        * IMDB Rating of the movie.
-        * Rotten Tomatoes Rating of the movie.
-        * Country where the movie was produced.
-        * Language of the movie.
-        * Plot of the movie.
-        * Actors in the movie. ))
-        */
-}
-
-function doWhatItSays() {
-    fs.readFile("random.txt", "utf8", function (err, data) {
-        if (err) {
-            return console.log('Error occurred: ' + err);
-        }
-        var dataArray = data.split(",");
-
-        var randomAction = dataArray[0];
-        var randomValue = dataArray[1];
-        if (randomAction === "do-what-it-says") {
-            console.log("Please use either spotify-this-song, concert-this, movie-this");
-            return;
-        }
-
-        functionCall(randomAction, randomValue);
-    });
-}
-
-const functionCall = function (theAction, theValue) {
-    // theAction: movie-this
-    // theValue: the+matrix
-    switch (theAction) {
-        case "spotify-this-song":
-            spotifyMySong(theValue);
-            break;
-
-        case "concert-this":
-            concert(theValue);
-            break;
-
-        case "movie-this":
-            movie(theValue);
-            break;
-
-        case "do-what-it-says":
-            doWhatItSays();
-            break;
-        default:
-            console.log("Please use either spotify-this-song, concert-this, movie-this, or do-what-it-says");
     }
-}
 
-functionCall(action, value);
+    const functionCall = function (theAction, theValue) {
+        // theAction: movie-this
+        // theValue: the+matrix
+        switch (theAction) {
+            case "spotify-this-song":
+                spotifyMySong(theValue);
+                break;
+
+            case "concert-this":
+                concert(theValue);
+                break;
+
+            case "movie-this":
+                movie(theValue);
+                break;
+
+            case "do-what-it-says":
+                doWhatItSays();
+                break;
+            default:
+                console.log("Please use either spotify-this-song, concert-this, movie-this, or do-what-it-says");
+        }
+    }
+
+    functionCall(action, value);
 
 /*
 Liri will understand four commands:
