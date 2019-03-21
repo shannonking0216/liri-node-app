@@ -1,35 +1,60 @@
 require("dotenv").config();
 const fs = require("fs");
 const axios = require("axios");
-const keys = require("./keys.js");
+const keys = require("./keys");
 const Spotify = require("node-spotify-api");
 const spotify = new Spotify(keys.spotify);
 
 // Takes in all of the command line arguments
 const inputString = process.argv;
 const action = process.argv[2];
-let value = process.argv[3];
+
+
+let value = "";
+for (var i = 3; i < process.argv.length; i++) {
+    value += process.argv[i] + "+";
+}
+value = value.slice(0, -1);
+
+// action: movie-this
+// value: the+matrix
+
+// first iteration - i+
+
+// second iteration - i+want+
+
+
+
 // store the results from each command here
-let results;
 
 // --------------------------------------------
 
-function spotifyMySong() {
-    const songTitle = process.argv[3];
-    spotify.search({ type: 'track', query: songTitle }, function (err, data) {
+function spotifyMySong(songTitle) {
+    // let searchTerm = "ace of bass";
+    // if (songTitle) {
+    //     searchTerm = songTitle;
+    // }
+
+    let searchTerm;
+    if (!songTitle) {
+        searchTerm = "Ace of Bass";
+    } else {
+        searchTerm = songTitle;
+    }
+
+    spotify.search({ type: 'track', query: searchTerm }, function (err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
-
         // console.log(JSON.stringify(data, null, 2));
-
         for (let i = 0; i < data.tracks.items.length; i++) {
             // artistData is printed in the terminal
             const artistData = data.tracks.items[i];
             // console.log(artistData.album);
             // the locations should come from the objects in the JSON data
-            console.log("Artist(s): " + artistData.artists[0].name + "\nSong Name: " + artistData.name + "\nSpotify Preview Link: " + artistData.preview_url + "\nAlbum Name: " + artistData.album.name);
+            console.log("\n\nArtist(s): " + artistData.artists[0].name + "\nSong Name: " + artistData.name + "\nSpotify Preview Link: " + artistData.preview_url + "\nAlbum Name: " + artistData.album.name);
         }
+        // If no song is provided, then your program will default to "The Sign" by Ace of Base
     });
 }
 
@@ -41,47 +66,68 @@ function concert() {
     console.log(JSON.stringify(data, null, 2));
 }
 
-function movie() {
-    if (err) {
-        return console.log('Error occurred: ' + err);
-    }
-    console.log(JSON.stringify(data, null, 2));
-    const movieTitle = process.argv[3];
-    axios.get("http://www.omdbapi.com/?i=tt3896198" + movieTitle + "&y=&plot=short&apikey=" + keys.omdbKey.secret)
+function movie(movieName) {
+
+    // console.log(JSON.stringify(data, null, 2));
+    // console.log("key", keys.omdbKey.secret);
+
+    var requestUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=" + keys.omdbKey.secret;
+    console.log(requestUrl);
+    axios.get(requestUrl)
         .then(function (response) {
             console.log(response.data);
+        })
+        .catch(function (err) {
+            console.log('Error occurred: ' + err);
         });
 }
 
-function doIt() {
-    fs.readFile("random.txt", "utf8", process.argv[3], function (err) {
+function doWhatItSays() {
+    fs.readFile("random.txt", "utf8", function (err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
-        console.log(JSON.stringify(data, null, 2));
+        var dataArray = data.split(",");
+
+        var randomAction = dataArray[0];
+        var randomValue = dataArray[1];
+
+        functionCall(randomAction, randomValue);
+
     });
 }
 
-
-switch (action) {
-    case "spotify-this-song":
-        spotifyMySong();
-        break;
-
-    case "concert-this":
-        concert();
-        break;
-
-    case "movie-this":
-        movie();
-        break;
-
-    case "do-what-it-says":
-        doIt();
-        break;
-    default:
-        console.log("Please use either spotify-this-song, concert-this, movie-this, or do-what-it-says");
+const functionCall = function(theAction, theValue) {
+    // theAction: movie-this
+    // theValue: the+matrix
+    switch (theAction) {
+        case "spotify-this-song":
+            spotifyMySong(theValue);
+            break;
+    
+        case "concert-this":
+            concert(theValue);
+            break;
+    
+        case "movie-this":
+            movie(theValue);
+            break;
+    
+        case "do-what-it-says":
+            doWhatItSays();
+            break;
+        default:
+            console.log("Please use either spotify-this-song, concert-this, movie-this, or do-what-it-says");
+    }
 }
+
+// console.log(action);
+// console.log(value);
+
+functionCall(action, value);
+
+
+
 
 
 /*
@@ -127,4 +173,6 @@ Liri will understand four commands:
     b. LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
             It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
             Edit the text in random.txt to test out the feature for movie-this and concert-this.
-*/
+
+USE GIPHY APP (maybe), and make a nice readme for your app
+            */
